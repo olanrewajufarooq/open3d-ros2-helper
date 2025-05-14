@@ -13,16 +13,17 @@
 - Easy conversion between ROS pose and transform 
 
 ## Dependencies
-- python 2.7
-- ros-numpy
-- open3d == 0.9 
+- python 3
+- ros2-numpy
+- open3d == 0.19 
 
 ## Installation
 ```
-$ sudo apt install ros-melodic-ros-numpy
-$ pip2 install numpy open3d==0.9.0 opencv-python==4.2.0.32 pyrsistent==0.13
-$ pip2 install open3d-ros2-helper
+$ pip install ros2-numpy
+$ pip install numpy==2.2 open3d==0.19 opencv-python==4.11.0
+$ pip install open3d-ros2-helper
 ```
+Note: there are known problems with installing ROS2 Numpy from pip. Considering following the instructions from the actual ROS2 numpy [ReadME](https://github.com/Box-Robotics/ros2_numpy) page.
 
 ## Usage
 
