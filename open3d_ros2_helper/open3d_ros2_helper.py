@@ -1,16 +1,13 @@
-import ros_numpy
+import ros2_numpy
 import open3d
 import numpy as np
-import tf.transformations as t
-import rospy
+import tf_transformations as t
+import rclpy
+from rclpy.node import Node
 import copy
-import image_geometry
 import cv2
-from std_msgs.msg import Header
-from sensor_msgs.msg import PointCloud2, PointField
-from geometry_msgs.msg import Point, Pose, PoseStamped, Quaternion, Transform, TransformStamped, Vector3
-import numpy as np
-import numpy.matlib as npm
+from sensor_msgs.msg import PointCloud2, PointField, Image, CameraInfo
+from geometry_msgs.msg import Pose, PoseStamped, Transform, TransformStamped
 
 
 def pose_to_pq(pose):
@@ -98,7 +95,7 @@ def msg_to_se3(msg):
     return se3
 
 
-def pq_to_pose_stamped(p, q, source_frame, target_frame, stamp=None):
+def pq_to_pose_stamped(p, q, source_frame, target_frame, stamp=None, node=None):
     """ convert position, quaternion to  geometry_msgs/PoseStamped
     Args:
         p (np.array): position array of [x, y, z]
@@ -110,7 +107,7 @@ def pq_to_pose_stamped(p, q, source_frame, target_frame, stamp=None):
     """
     pose_stamped = PoseStamped()
     pose_stamped.header.frame_id = source_frame
-    if stamp is None: stamp = rospy.Time.now() 
+    if stamp is None: stamp = node.get_clock().now().to_msg() 
     pose_stamped.header.stamp = stamp
     pose_stamped.child_frame_id = target_frame
     pose_stamped.pose = pq_to_pose(p, q)
@@ -154,7 +151,7 @@ def pq_to_transform(p, q):
     transform.rotation.w = q[3]
     return transform
 
-def pq_to_transform_stamped(p, q, source_frame, target_frame, stamp=None):
+def pq_to_transform_stamped(p, q, source_frame, target_frame, stamp=None, node=None):
     """ convert position, quaternion to geometry_msgs/TransformStamped
 
     Args:
@@ -168,7 +165,7 @@ def pq_to_transform_stamped(p, q, source_frame, target_frame, stamp=None):
 
     transform_stamped = TransformStamped()
     transform_stamped.header.frame_id = source_frame
-    if stamp is None: stamp = rospy.Time.now() 
+    if stamp is None: stamp = node.get_clock().now().to_msg() 
     transform_stamped.header.stamp = stamp
     transform_stamped.child_frame_id = target_frame
     transform_stamped.transform = pq_to_transform(p, q)
@@ -188,7 +185,7 @@ def se3_to_transform(transform_nparray):
     return transform
 
 
-def se3_to_transform_stamped(transform_nparray, source_frame, target_frame, stamp=None):
+def se3_to_transform_stamped(transform_nparray, source_frame, target_frame, stamp=None, node=None):
     """ convert 4x4 SE(3) to geometry_msgs/TransformStamped
     Args:
         transform_nparray (np.array): 4x4 SE(3) 
@@ -199,7 +196,7 @@ def se3_to_transform_stamped(transform_nparray, source_frame, target_frame, stam
     """
     pos = transform_nparray[:3, 3] 
     quat = t.quaternion_from_matrix(transform_nparray)
-    if stamp is None: stamp = rospy.Time.now() 
+    if stamp is None: stamp = node.get_clock().now().to_msg() 
     transform_stamped = pq_to_transform_stamped(pos, quat, source_frame, target_frame, stamp)
     return transform_stamped
 
@@ -214,7 +211,7 @@ def average_q(qs):
     """
     # Number of quaternions to average
     M = qs.shape[0]
-    A = npm.zeros(shape=(4,4))
+    A = np.zeros((4,4))
     for i in range(0,M):
         q = qs[i,:]
         # multiply q with its transposed version q' and add A
@@ -258,7 +255,7 @@ def rospc_to_o3dpc(rospc, remove_nans=False):
     """
     field_names = [field.name for field in rospc.fields]
     is_rgb = 'rgb' in field_names
-    cloud_array = ros_numpy.point_cloud2.pointcloud2_to_array(rospc).ravel()
+    cloud_array = ros2_numpy.point_cloud2.pointcloud2_to_array(rospc).ravel()
     if remove_nans:
         mask = np.isfinite(cloud_array['x']) & np.isfinite(cloud_array['y']) & np.isfinite(cloud_array['z'])
         cloud_array = cloud_array[mask]
@@ -291,7 +288,7 @@ def rospc_to_o3dpc(rospc, remove_nans=False):
 BIT_MOVE_16 = 2**16
 BIT_MOVE_8 = 2**8
 
-def o3dpc_to_rospc(o3dpc, frame_id=None, stamp=None):
+def o3dpc_to_rospc(o3dpc, frame_id=None, stamp=None, node=None):
     """ convert open3d point cloud to ros point cloud
     Args:
         o3dpc (open3d.geometry.PointCloud): open3d point cloud
@@ -330,12 +327,12 @@ def o3dpc_to_rospc(o3dpc, frame_id=None, stamp=None):
         rgb_npy = rgb_npy.astype(np.uint32)
         data['rgb'] = rgb_npy
 
-    rospc = ros_numpy.msgify(PointCloud2, data)
+    rospc = ros2_numpy.msgify(PointCloud2, data)
     if frame_id is not None:
         rospc.header.frame_id = frame_id
 
     if stamp is None:
-        rospc.header.stamp = rospy.Time.now()
+        rospc.header.stamp = node.get_clock().now().to_msg()
     else:
         rospc.header.stamp = stamp
     rospc.height = 1
@@ -510,4 +507,114 @@ def ppf_icp_registration(source_cloud, target_cloud, n_points=3000, n_iter=100, 
     else:
         return pose, residual
 
+def convert_rgbd(color_msg: Image, depth_msg: Image, depth_scale=1000.0, depth_trunc=3.0):
+    """
+    Convert synchronized ROS 2 Image messages into Open3D RGBDImage.
 
+    Args:
+        color_msg (sensor_msgs.msg.Image): RGB image
+        depth_msg (sensor_msgs.msg.Image): Depth image (16UC1)
+        depth_scale (float): Scaling factor for converting depth from int to meters
+        depth_trunc (float): Maximum depth to consider
+
+    Returns:
+        open3d.geometry.RGBDImage
+    """
+    color_np = ros2_numpy.numpify(color_msg)
+    depth_np = ros2_numpy.numpify(depth_msg).astype(np.float32)
+
+    depth_np = np.nan_to_num(depth_np, nan=0.0)
+    depth_np[depth_np < 0.0] = 0.0
+    depth_np[depth_np > depth_trunc] = 0.0
+
+    if color_np.dtype != np.uint8:
+        color_np = color_np.astype(np.uint8)
+    if len(color_np.shape) == 2:
+        color_np = np.stack([color_np]*3, axis=-1)
+
+    color_o3d = open3d.geometry.Image(color_np)
+    
+    enc = depth_msg.encoding.lower()
+    if enc == '16uc1':
+        # stored in millimeters or similar
+        depth_o3d = open3d.geometry.Image(depth_np.astype(np.uint16))
+        ds = depth_scale
+    elif enc == '32fc1':
+        # stored in meters directly
+        depth_o3d = open3d.geometry.Image(depth_np)  # float32
+        ds = 1.0
+    else:
+        raise ValueError(f"Unsupported depth encoding: {depth_msg.encoding}")
+
+
+    return open3d.geometry.RGBDImage.create_from_color_and_depth(
+        color_o3d, depth_o3d,
+        depth_scale=ds,
+        depth_trunc=depth_trunc,
+        convert_rgb_to_intensity=False
+    )
+
+def convert_rgbd_from_pointcloud(color_msg: Image, pc_msg: PointCloud2, width: int, height: int,
+                                 depth_scale=1000.0, depth_trunc=3.0):
+    """
+    Convert ROS 2 color image and PointCloud2 depth map into Open3D RGBDImage.
+
+    Args:
+        color_msg (sensor_msgs.msg.Image): Color image
+        pc_msg (sensor_msgs.msg.PointCloud2): Organized point cloud (XYZ or XYZRGB)
+        width (int): Image width (must match camera_info)
+        height (int): Image height (must match camera_info)
+        depth_scale (float): Scale factor for converting depth to meters
+        depth_trunc (float): Max valid depth
+
+    Returns:
+        open3d.geometry.RGBDImage
+    """
+    # Convert color image
+    color_np = ros2_numpy.numpify(color_msg)
+    color_np = np.nan_to_num(color_np, nan=0)
+    color_np = np.clip(color_np, 0, 255).astype(np.uint8)
+
+    if len(color_np.shape) == 2:
+        color_np = np.stack([color_np]*3, axis=-1)
+    color_o3d = open3d.geometry.Image(color_np)
+
+    # Convert PointCloud2 to array and extract Z
+    pc_array = ros2_numpy.numpify(pc_msg)
+    z_values = pc_array['z'].reshape((height, width)).copy() 
+
+    z_values = np.nan_to_num(z_values, nan=0.0)
+    z_values[z_values < 0.0] = 0.0
+    z_values[z_values > depth_trunc] = 0.0
+    
+    depth_image = (z_values * depth_scale).astype(np.uint16)
+    depth_o3d = open3d.geometry.Image(depth_image)
+    
+    rgbd = open3d.geometry.RGBDImage.create_from_color_and_depth(
+        color_o3d, depth_o3d,
+        depth_scale=depth_scale,
+        depth_trunc=depth_trunc,
+        convert_rgb_to_intensity=False
+    )
+
+    return rgbd
+
+
+def convert_intrinsics(camera_info_msg: CameraInfo):
+    """
+    Convert a ROS 2 CameraInfo message into Open3D PinholeCameraIntrinsic.
+
+    Args:
+        camera_info_msg (sensor_msgs.msg.CameraInfo)
+
+    Returns:
+        open3d.camera.PinholeCameraIntrinsic
+    """
+    return open3d.camera.PinholeCameraIntrinsic(
+        width=camera_info_msg.width,
+        height=camera_info_msg.height,
+        fx=camera_info_msg.k[0],
+        fy=camera_info_msg.k[4],
+        cx=camera_info_msg.k[2],
+        cy=camera_info_msg.k[5]
+    )

@@ -4,18 +4,18 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="open3d_ros_helper",
-    version="0.2.0.3",
-    author="Seunghyeok Back",
-    author_email="shback@gist.ac.kr",
+    name="open3d_ros2_helper",
+    version="0.0.0.1",
+    author="Farooq Olanrewaju",
+    author_email="olanrewajufarooq@yahoo.com",
     description="A helper tool for jointly using open3d and ROS",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/SeungBack/open3d-ros-helper",
+    url="https://github.com/olanrewajufarooq/open3d-ros2-helper",
     packages=setuptools.find_packages(),
+    license="MIT",
     classifiers=[
-        "Programming Language :: Python :: 2.7",
-        "License :: OSI Approved :: MIT License",
+        "Programming Language :: Python :: 3.10",
         "Operating System :: OS Independent",
     ],
 )

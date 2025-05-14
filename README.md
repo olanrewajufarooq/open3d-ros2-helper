@@ -1,4 +1,4 @@
-# open3d-ros-helper
+# open3d-ros2-helper
 
 [![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://GitHub.com/Naereen/StrapDown.js/graphs/commit-activity)
 [![PyPI version](https://badge.fury.io/py/open3d-ros-helper.svg)](https://badge.fury.io/py/open3d-ros-helper)
@@ -21,14 +21,14 @@
 ```
 $ sudo apt install ros-melodic-ros-numpy
 $ pip2 install numpy open3d==0.9.0 opencv-python==4.2.0.32 pyrsistent==0.13
-$ pip2 install open3d_ros_helper
+$ pip2 install open3d-ros2-helper
 ```
 
 ## Usage
 
-Import `open3d-ros-helper`
+Import `open3d-ros2-helper`
 ```
-from open3d_ros_helper import open3d_ros_helper as orh
+from open3d-ros2-helper import open3d-ros2-helper as orh
 ```
 
 Convert `4x4 SE(3)` to `geometry_msgs/Transform`
@@ -65,26 +65,26 @@ Some codes are rewritten from
 
 # Documentation
 ## Table of contents
-* [pose\_to\_pq](#open3d_ros_helper.pose_to_pq)
-* [pose\_stamped\_to\_pq](#open3d_ros_helper.pose_stamped_to_pq)
-* [transform\_to\_pq](#open3d_ros_helper.transform_to_pq)
-* [transform\_stamped\_to\_pq](#open3d_ros_helper.transform_stamped_to_pq)
-* [msg\_to\_se3](#open3d_ros_helper.msg_to_se3)
-* [pq\_to\_transform](#open3d_ros_helper.pq_to_transform)
-* [pq\_to\_transform\_stamped](#open3d_ros_helper.pq_to_transform_stamped)
-* [se3\_to\_transform](#open3d_ros_helper.se3_to_transform)
-* [se3\_to\_transform\_stamped](#open3d_ros_helper.se3_to_transform_stamped)
-* [average\_q](#open3d_ros_helper.average_q)
-* [average\_pq](#open3d_ros_helper.average_pq)
-* [rospc\_to\_o3dpc](#open3d_ros_helper.rospc_to_o3dpc)
-* [o3dpc\_to\_rospc](#open3d_ros_helper.o3dpc_to_rospc)
-* [do\_transform\_point](#open3d_ros_helper.do_transform_point)
-* [apply\_pass\_through\_filter](#open3d_ros_helper.apply_pass_through_filter)
-* [crop\_with\_2dmask](#open3d_ros_helper.crop_with_2dmask)
-* [p2p\_icp\_registration](#open3d_ros_helper.p2p_icp_registration)
-* [ppf\_icp\_registration](#open3d_ros_helper.ppf_icp_registration)
+* [pose\_to\_pq](#open3d-ros2-helper.pose_to_pq)
+* [pose\_stamped\_to\_pq](#open3d-ros2-helper.pose_stamped_to_pq)
+* [transform\_to\_pq](#open3d-ros2-helper.transform_to_pq)
+* [transform\_stamped\_to\_pq](#open3d-ros2-helper.transform_stamped_to_pq)
+* [msg\_to\_se3](#open3d-ros2-helper.msg_to_se3)
+* [pq\_to\_transform](#open3d-ros2-helper.pq_to_transform)
+* [pq\_to\_transform\_stamped](#open3d-ros2-helper.pq_to_transform_stamped)
+* [se3\_to\_transform](#open3d-ros2-helper.se3_to_transform)
+* [se3\_to\_transform\_stamped](#open3d-ros2-helper.se3_to_transform_stamped)
+* [average\_q](#open3d-ros2-helper.average_q)
+* [average\_pq](#open3d-ros2-helper.average_pq)
+* [rospc\_to\_o3dpc](#open3d-ros2-helper.rospc_to_o3dpc)
+* [o3dpc\_to\_rospc](#open3d-ros2-helper.o3dpc_to_rospc)
+* [do\_transform\_point](#open3d-ros2-helper.do_transform_point)
+* [apply\_pass\_through\_filter](#open3d-ros2-helper.apply_pass_through_filter)
+* [crop\_with\_2dmask](#open3d-ros2-helper.crop_with_2dmask)
+* [p2p\_icp\_registration](#open3d-ros2-helper.p2p_icp_registration)
+* [ppf\_icp\_registration](#open3d-ros2-helper.ppf_icp_registration)
 
-<a name="open3d_ros_helper.pose_to_pq"></a>
+<a name="open3d-ros2-helper.pose_to_pq"></a>
 #### pose\_to\_pq
 
 ```python
@@ -103,7 +103,7 @@ convert a ROS PoseS message into position/quaternion np arrays
 - `q` _np.array_ - quaternion array of [x, y, z, w]
   source codes from https://answers.ros.org/question/332407/transformstamped-to-transformation-matrix-python/
 
-<a name="open3d_ros_helper.pose_stamped_to_pq"></a>
+<a name="open3d-ros2-helper.pose_stamped_to_pq"></a>
 #### pose\_stamped\_to\_pq
 
 ```python
@@ -122,7 +122,7 @@ convert a ROS PoseStamped message into position/quaternion np arrays
 - `q` _np.array_ - quaternion array of [x, y, z, w]
   source codes from https://answers.ros.org/question/332407/transformstamped-to-transformation-matrix-python/
 
-<a name="open3d_ros_helper.transform_to_pq"></a>
+<a name="open3d-ros2-helper.transform_to_pq"></a>
 #### transform\_to\_pq
 
 ```python
@@ -141,7 +141,7 @@ convert a ROS Transform message into position/quaternion np arrays
 - `q` _np.array_ - quaternion array of [x, y, z, w]
   source codes from https://answers.ros.org/question/332407/transformstamped-to-transformation-matrix-python/
 
-<a name="open3d_ros_helper.transform_stamped_to_pq"></a>
+<a name="open3d-ros2-helper.transform_stamped_to_pq"></a>
 #### transform\_stamped\_to\_pq
 
 ```python
@@ -160,7 +160,7 @@ convert a ROS TransformStamped message into position/quaternion np arrays
 - `q` _np.array_ - quaternion array of [x, y, z, w]
   source codes from https://answers.ros.org/question/332407/transformstamped-to-transformation-matrix-python/
 
-<a name="open3d_ros_helper.msg_to_se3"></a>
+<a name="open3d-ros2-helper.msg_to_se3"></a>
 #### msg\_to\_se3
 
 ```python
@@ -179,7 +179,7 @@ convert geometric ROS messages to SE(3)
 - `se3` _np.array_ - a 4x4 SE(3) matrix as a numpy array
   source codes from https://answers.ros.org/question/332407/transformstamped-to-transformation-matrix-python/
 
-<a name="open3d_ros_helper.pq_to_transform"></a>
+<a name="open3d-ros2-helper.pq_to_transform"></a>
 #### pq\_to\_transform
 
 ```python
@@ -197,7 +197,7 @@ convert position, quaternion to geometry_msgs/Transform
 
 - `transform` _geometry_msgs/Transform_ - ROS transform of given p and q
 
-<a name="open3d_ros_helper.pq_to_transform_stamped"></a>
+<a name="open3d-ros2-helper.pq_to_transform_stamped"></a>
 #### pq\_to\_transform\_stamped
 
 ```python
@@ -217,7 +217,7 @@ convert position, quaternion to geometry_msgs/TransformStamped
 
 - `transform_stamped` _geometry_msgs/TransformStamped_ - ROS transform_stamped of given p and q
 
-<a name="open3d_ros_helper.se3_to_transform"></a>
+<a name="open3d-ros2-helper.se3_to_transform"></a>
 #### se3\_to\_transform
 
 ```python
@@ -234,7 +234,7 @@ convert 4x4 SE(3) to geometry_msgs/Transform
 
 - `transform` _geometry_msgs/Transform_ - ROS transform of given SE(3)
 
-<a name="open3d_ros_helper.se3_to_transform_stamped"></a>
+<a name="open3d-ros2-helper.se3_to_transform_stamped"></a>
 #### se3\_to\_transform\_stamped
 
 ```python
@@ -253,7 +253,7 @@ convert 4x4 SE(3) to geometry_msgs/TransformStamped
 
 - `transform_stamped` _geometry_msgs/TransformStamped_ - ROS transform_stamped of given SE(3)
 
-<a name="open3d_ros_helper.average_q"></a>
+<a name="open3d-ros2-helper.average_q"></a>
 #### average\_q
 
 ```python
@@ -271,7 +271,7 @@ calculate the average of quaternions
 - `q_average` _np.array_ - averaged quaternion array
   source codes from https://github.com/christophhagen/averaging-quaternions
 
-<a name="open3d_ros_helper.average_pq"></a>
+<a name="open3d-ros2-helper.average_pq"></a>
 #### average\_pq
 
 ```python
@@ -290,7 +290,7 @@ average the multiple position and quaternion array
 - `p_mean` _np.array_ - averaged position array
 - `q_mean` _np.array_ - averaged quaternion array
 
-<a name="open3d_ros_helper.rospc_to_o3dpc"></a>
+<a name="open3d-ros2-helper.rospc_to_o3dpc"></a>
 #### rospc\_to\_o3dpc
 
 ```python
@@ -308,7 +308,7 @@ covert ros point cloud to open3d point cloud
 
 - `o3dpc` _open3d.geometry.PointCloud_ - open3d point cloud
 
-<a name="open3d_ros_helper.o3dpc_to_rospc"></a>
+<a name="open3d-ros2-helper.o3dpc_to_rospc"></a>
 #### o3dpc\_to\_rospc
 
 ```python
@@ -327,7 +327,7 @@ convert open3d point cloud to ros point cloud
 
 - `rospc` _sensor.msg.PointCloud2_ - ros point cloud message
 
-<a name="open3d_ros_helper.do_transform_point"></a>
+<a name="open3d-ros2-helper.do_transform_point"></a>
 #### do\_transform\_point
 
 ```python
@@ -346,7 +346,7 @@ open3d version of tf2_geometry_msgs.do_transform_point
 
 - `o3dpc` _open3d.geometry.PointCloud_ - transformed open3d point cloud
 
-<a name="open3d_ros_helper.apply_pass_through_filter"></a>
+<a name="open3d-ros2-helper.apply_pass_through_filter"></a>
 #### apply\_pass\_through\_filter
 
 ```python
@@ -367,7 +367,7 @@ apply 3D pass through filter to the open3d point cloud
 - `o3dpc` _open3d.geometry.PointCloud_ - filtered open3d point cloud
   some codes from https://github.com/powersimmani/example_3d_pass_through-filter_guide
 
-<a name="open3d_ros_helper.crop_with_2dmask"></a>
+<a name="open3d-ros2-helper.crop_with_2dmask"></a>
 #### crop\_with\_2dmask
 
 ```python
@@ -385,7 +385,7 @@ crop open3d point cloud with given 2d binary mask
 
 - `o3dpc` _open3d.geometry.PointCloud_ - filtered open3d point cloud
 
-<a name="open3d_ros_helper.p2p_icp_registration"></a>
+<a name="open3d-ros2-helper.p2p_icp_registration"></a>
 #### p2p\_icp\_registration
 
 ```python
@@ -404,7 +404,7 @@ align the source cloud to the target cloud using point-to-point ICP registration
 
 - `icp_result` _open3d.registration.RegistrationResult_ - registration result
 
-<a name="open3d_ros_helper.ppf_icp_registration"></a>
+<a name="open3d-ros2-helper.ppf_icp_registration"></a>
 #### ppf\_icp\_registration
 
 ```python
